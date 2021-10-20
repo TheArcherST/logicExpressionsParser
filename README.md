@@ -1,13 +1,13 @@
-logicStatementsParser
+logicExpressionsParser
 =====================
 
-Can parse statements following types:
+Can parse expressions following types:
 
 ```
 false || !true & !(!false || !false) -> true == false
 ```
 
-This statement returns `False`.
+This returns `False`.
 
 Supported operations:
 1. Not `!`
