@@ -7,7 +7,7 @@ Can parse statements following types:
 false || !true & !(!false || !false) -> true == false
 ```
 
-This statement returns False.
+This statement returns `False`.
 
 Supported operations:
 1. Not `!`
