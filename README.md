@@ -22,7 +22,7 @@ for answers in all cases.
 
 For example:
 
-`a & true`
+>>> `a & true`
 
 ```
 
