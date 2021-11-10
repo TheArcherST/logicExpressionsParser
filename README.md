@@ -24,7 +24,11 @@ For example:
 
 `a & true`
 
+```
+
 a   result
 --- ------
 0   False
 1   True
+
+```
