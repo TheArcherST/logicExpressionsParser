@@ -17,9 +17,17 @@ class TokenTypes:
     EOF = 'EOF'
 
 
+class OperationTypes:
+    FACTOR = 'FACTOR'
+    BINARY = 'BINARY'
+    UNARY = 'UNARY'
+    EOF = 'EOF'
+
+
 @dataclass
 class Token:
     type: str
+    op_type: str
     value: typing.Optional[typing.Union[str, bool]]
 
 
@@ -45,7 +53,7 @@ class Lexer:
         
         return text
 
-    def iterator(self) -> typing.Generator:
+    def iterator(self) -> typing.Generator[Token, None, None]:
         text = self.normalize_text(self.text)
         for i in text.split():
             token = self._token_factory(i)
@@ -57,23 +65,23 @@ class Lexer:
         result = None
 
         if text == '&':
-            result = Token(TokenTypes.AND, text)
+            result = Token(TokenTypes.AND, OperationTypes.BINARY, text)
         elif text == '||':
-            result = Token(TokenTypes.OR, text)
+            result = Token(TokenTypes.OR, OperationTypes.BINARY, text)
         elif text == '!':
-            result = Token(TokenTypes.NOT, text)
+            result = Token(TokenTypes.NOT, OperationTypes.UNARY, text)
         elif text == '->':
-            result = Token(TokenTypes.IMPLICATION, text)
+            result = Token(TokenTypes.IMPLICATION, OperationTypes.BINARY, text)
         elif text == '==':
-            result = Token(TokenTypes.EQUALITY, text)
+            result = Token(TokenTypes.EQUALITY, OperationTypes.BINARY, text)
         elif text == '(':
-            result = Token(TokenTypes.LPAREN, text)
+            result = Token(TokenTypes.LPAREN, OperationTypes.FACTOR, text)
         elif text == ')':
-            result = Token(TokenTypes.RPAREN, text)
+            result = Token(TokenTypes.RPAREN, OperationTypes.FACTOR, text)
         elif text in ('true', '1'):
-            result = Token(TokenTypes.BOOL, True)
+            result = Token(TokenTypes.BOOL, OperationTypes.FACTOR, True)
         elif text in ('false', '0'):
-            result = Token(TokenTypes.BOOL, False)
+            result = Token(TokenTypes.BOOL, OperationTypes.FACTOR, False)
 
         if result:
             return result

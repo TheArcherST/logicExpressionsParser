@@ -1,4 +1,6 @@
-from lexer import Lexer, Token, TokenTypes
+import typing
+
+from lexer import Lexer, Token, TokenTypes, OperationTypes
 
 
 def implication(x, y):
@@ -8,14 +10,18 @@ def implication(x, y):
 class Interpreter:
     def __init__(self, text: str):
         self.tokens_iterator = Lexer(text).iterator()
-        self.current_token = self._next_token()
+        self.current_token = Token(TokenTypes.EOF, OperationTypes.EOF, None)
+        self.previous_token = Token(TokenTypes.EOF, OperationTypes.EOF, None)
+
+        self._next_token()
 
     def _next_token(self):
+        self.previous_token = self.current_token
+
         try:
             self.current_token = self.tokens_iterator.__next__()
-
         except StopIteration:
-            self.current_token = Token(TokenTypes.EOF, None)
+            self.current_token = Token(TokenTypes.EOF, OperationTypes.EOF, None)
 
         return self.current_token
 
@@ -23,7 +29,7 @@ class Interpreter:
         if self.current_token.type == token_type:
             return self._next_token()
         else:
-            raise Exception('Invalid syntax')
+            self._raise_syntax_error(f'excepted token `{token_type}`')
 
     def expr(self):
         result = self.eq_()
@@ -34,7 +40,8 @@ class Interpreter:
 
         while self.current_token.type == TokenTypes.EQUALITY:
             self.eat(TokenTypes.EQUALITY)
-            result = result == self.smpl_()
+            factor = self.smpl_()
+            result = result == factor
 
         return result
 
@@ -43,7 +50,8 @@ class Interpreter:
 
         while self.current_token.type == TokenTypes.IMPLICATION:
             self.eat(TokenTypes.IMPLICATION)
-            result = implication(result, self.or_())
+            factor = self.or_()
+            result = implication(result, factor)
 
         return result
 
@@ -52,7 +60,8 @@ class Interpreter:
 
         while self.current_token.type == TokenTypes.OR:
             self.eat(TokenTypes.OR)
-            result = result.__or__(self.and_())
+            factor = self.and_()
+            result = result.__or__(factor)
 
         return result
 
@@ -61,7 +70,8 @@ class Interpreter:
 
         while self.current_token.type == TokenTypes.AND:
             self.eat(TokenTypes.AND)
-            result = result and self.not_()
+            factor = self.not_()
+            result = result and factor
 
         return result
 
@@ -70,21 +80,31 @@ class Interpreter:
 
         while self.current_token.type == TokenTypes.NOT:
             self.eat(TokenTypes.NOT)
-            result = not self.factor()
+            factor = self.factor()
+            result = not factor
 
         return result
 
     def factor(self):
         token = self.current_token
+
         if token.type == TokenTypes.BOOL:
             self.eat(TokenTypes.BOOL)
+            result = token.value
 
-            return token.value
         elif token.type == TokenTypes.LPAREN:
             self.eat(TokenTypes.LPAREN)
             result = self.expr()
             self.eat(TokenTypes.RPAREN)
+            result = result
 
-            return result
         elif token.type == TokenTypes.EOF:
-            return None
+            raise Exception(f'Interpreter: excepted factor, but {token.type} got')
+        else:
+            result = None
+
+        return result
+
+    @staticmethod
+    def _raise_syntax_error(msg: str) -> typing.NoReturn:
+        raise Exception(f'Invalid syntax: {msg}')
