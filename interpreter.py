@@ -7,11 +7,14 @@ def implication(x, y):
     return (not x).__or__(y)
 
 
+EOF = Token(TokenTypes.EOF, OperationTypes.EOF, None)
+
+
 class Interpreter:
     def __init__(self, text: str):
         self.tokens_iterator = Lexer(text).iterator()
-        self.current_token = Token(TokenTypes.EOF, OperationTypes.EOF, None)
-        self.previous_token = Token(TokenTypes.EOF, OperationTypes.EOF, None)
+        self.current_token = EOF
+        self.previous_token = EOF
 
         self._next_token()
 
@@ -99,7 +102,7 @@ class Interpreter:
             result = result
 
         elif token.type == TokenTypes.EOF:
-            raise Exception(f'Interpreter: excepted factor, but {token.type} got')
+            return self._raise_syntax_error(f'excepted factor, but {token.type} got')
         else:
             result = None
 

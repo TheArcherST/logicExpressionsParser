@@ -8,18 +8,12 @@ from itertools import product
 def replace_word(text: str, old__: str, new__: str):
     old__, new__ = str(old__), str(new__)
 
-    text = f' {text} '
+    def word_scope(string: str):
+        return f' {string} '
 
-    while True:
-        start = text.find(' ' + old__ + ' ')
-
-        if start == -1:
-            break
-
-        spl = list(text)
-        for num, i in enumerate(range(start + 1, start + len(old__) + 1)):
-            spl[i] = new__[num]
-        text = ''.join(spl)
+    text = word_scope(text)
+    text = text.replace(word_scope(old__), word_scope(new__))
+    text = text[1:-1]
 
     return text
 
