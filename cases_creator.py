@@ -8,14 +8,7 @@ from itertools import product
 def replace_word(text: str, old__: str, new__: str):
     old__, new__ = str(old__), str(new__)
 
-    if text == old__:
-        return new__
-    if text.startswith(old__ + ' '):
-        text = text.removeprefix(old__)
-        text = new__ + text
-    if text.endswith(' ' + old__):
-        text = text.removesuffix(old__)
-        text = text + new__
+    text = f' {text} '
 
     while True:
         start = text.find(' ' + old__ + ' ')
