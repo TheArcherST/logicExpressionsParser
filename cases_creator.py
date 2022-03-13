@@ -25,9 +25,15 @@ class CasesCreator:
 
     """
 
+    @staticmethod
+    def validate_literal(literal: str):
+        return literal.startswith('?')
+
     def __init__(self, text: str):
         self.text = text
-        self.literals = Lexer.get_unknown_names(text)
+        self.literals = list(
+            filter(self.validate_literal, Lexer.get_unknown_names(text))
+        )
 
     def __iter__(self) -> tuple[typing.Iterable[int], int]:
         sequence_len = len(self.literals)

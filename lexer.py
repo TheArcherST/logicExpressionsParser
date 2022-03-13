@@ -1,6 +1,8 @@
 import typing
 from dataclasses import dataclass
 
+from colorama import Style
+
 
 class TokenTypes:
     LPAREN = 'LPAREN'
@@ -29,6 +31,16 @@ class Token:
     type: str
     op_type: str
     value: typing.Optional[typing.Union[str, bool]]
+    real_position: int = None
+
+    def visualize_location(self, text: str, marker='') -> str:
+        if self.type == TokenTypes.EOF:
+            self.real_position = len(text) + 2
+
+        result = text + '\n'
+        result += ' ' * (self.real_position - 1) + marker + '^' + Style.RESET_ALL
+
+        return result
 
 
 class Lexer:
@@ -55,38 +67,42 @@ class Lexer:
 
     def iterator(self) -> typing.Generator[Token, None, None]:
         text = self.normalize_text(self.text)
-        for i in text.split():
-            token = self._token_factory(i)
+        position = 0
+        div_literal = ' '
+        for i in text.split(div_literal):
+            token = self._token_factory(i, position)
             yield token
+            position += len(i) + len(div_literal)
 
     @staticmethod
-    def _token_factory(text: str) -> Token:
-
+    def _token_factory(text: str, real_position: int = None) -> Token:
         result = None
 
         if text == '&':
-            result = Token(TokenTypes.AND, OperationTypes.BINARY, text)
+            result = Token(TokenTypes.AND, OperationTypes.BINARY, text, real_position)
         elif text == '||':
-            result = Token(TokenTypes.OR, OperationTypes.BINARY, text)
+            result = Token(TokenTypes.OR, OperationTypes.BINARY, text, real_position)
         elif text == '!':
-            result = Token(TokenTypes.NOT, OperationTypes.UNARY, text)
+            result = Token(TokenTypes.NOT, OperationTypes.UNARY, text, real_position)
         elif text == '->':
-            result = Token(TokenTypes.IMPLICATION, OperationTypes.BINARY, text)
+            result = Token(TokenTypes.IMPLICATION, OperationTypes.BINARY, text, real_position)
         elif text == '==':
-            result = Token(TokenTypes.EQUALITY, OperationTypes.BINARY, text)
+            result = Token(TokenTypes.EQUALITY, OperationTypes.BINARY, text, real_position)
         elif text == '(':
-            result = Token(TokenTypes.LPAREN, OperationTypes.FACTOR, text)
+            result = Token(TokenTypes.LPAREN, OperationTypes.FACTOR, text, real_position)
         elif text == ')':
-            result = Token(TokenTypes.RPAREN, OperationTypes.FACTOR, text)
+            result = Token(TokenTypes.RPAREN, OperationTypes.FACTOR, text, real_position)
         elif text in ('true', '1'):
-            result = Token(TokenTypes.BOOL, OperationTypes.FACTOR, True)
+            result = Token(TokenTypes.BOOL, OperationTypes.FACTOR, True, real_position)
         elif text in ('false', '0'):
-            result = Token(TokenTypes.BOOL, OperationTypes.FACTOR, False)
+            result = Token(TokenTypes.BOOL, OperationTypes.FACTOR, False, real_position)
+        elif text == '':
+            result = Token(TokenTypes.EOF, OperationTypes.EOF, None)
 
         if result:
             return result
         else:
-            raise KeyError(f'Name {text} not found')
+            raise KeyError(f'Lexer: name {text} not found')
 
     @classmethod
     def get_unknown_names(cls, text: str) -> list[str]:

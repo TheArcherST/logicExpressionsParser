@@ -18,15 +18,16 @@ Supported operations:
 
 And file cases_creator.py adds next feature:
 you can write letters into statement and look
-for answers in all cases.
+for answers in all cases. Note that you must 
+write `?` before your letter or name.
 
 For example:
 
-`a & true`
+`?a & true`
 
 ```
 
-a   result
+?a   result
 --- ------
 0   False
 1   True
