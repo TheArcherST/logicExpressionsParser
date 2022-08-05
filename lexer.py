@@ -62,7 +62,11 @@ class Lexer:
         # rm all double spaces
         while text.find('  ') != -1:
             text = text.replace('  ', ' ')
-        
+
+        # remove start space
+        if text.startswith(' '):
+            text = text[1:]
+
         return text
 
     def iterator(self) -> typing.Generator[Token, None, None]:

@@ -9,7 +9,7 @@ def implication(x, y):
 
 
 EOF = Token(TokenTypes.EOF, OperationTypes.EOF, None)
-_T = typing.TypeVar('_T')
+_TT = typing.TypeVar('_TT', bound=Token)
 
 
 class Interpreter:
@@ -110,8 +110,6 @@ class Interpreter:
         return result
 
     def _report_runtime_error(self, invalid_token: Token, excepted_type: str = None) -> None:
-        text = self.lexer.text
-
         if (invalid_token.real_position is None) & (invalid_token.type != TokenTypes.EOF):
             print('Not located runtime error')
         else:
@@ -120,9 +118,9 @@ class Interpreter:
         if excepted_type is not None:
             print(f'Excepted token `{excepted_type}`, but `{invalid_token.type}` got')
 
-    def _check_result(self, data: _T) -> _T:
+    def _check_result(self, data: _TT) -> _TT:
         if self.previous_token.op_type in (OperationTypes.BINARY, OperationTypes.UNARY):
-            if not data.type == TokenTypes.BOOL:
+            if not data.op_type == OperationTypes.FACTOR:
                 self._report_runtime_error(data, TokenTypes.BOOL)
 
         return data
