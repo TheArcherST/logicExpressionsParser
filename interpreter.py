@@ -105,7 +105,7 @@ class Interpreter:
         elif token.type == TokenTypes.EOF:
             result = None
         else:
-            result = None
+            result = self.current_token
 
         return result
 
@@ -120,7 +120,7 @@ class Interpreter:
 
     def _check_result(self, data: _TT) -> _TT:
         if self.previous_token.op_type in (OperationTypes.BINARY, OperationTypes.UNARY):
-            if not data.op_type == OperationTypes.FACTOR:
+            if data.op_type not in (OperationTypes.FACTOR, OperationTypes.UNARY):
                 self._report_runtime_error(data, TokenTypes.BOOL)
 
         return data

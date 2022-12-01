@@ -3,6 +3,7 @@ from tabulate import tabulate
 from colorama import Fore
 
 from cases_creator import CasesCreator
+from lexer import Lexer
 
 
 @contextmanager
