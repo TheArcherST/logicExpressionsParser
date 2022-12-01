@@ -31,7 +31,7 @@ class Token:
     type: str
     op_type: str
     value: typing.Optional[typing.Union[str, bool]]
-    real_position: int = None
+    real_position: typing.Optional[int] = None
 
     def visualize_location(self, text: str, marker='') -> str:
         if self.type == TokenTypes.EOF:
